@@ -56,7 +56,7 @@ instance Tree.AddMonoid {α : Type} : AddMonoid (Tree α) :=
       sorry
     zero_add  :=
       sorry
-    nsmul     := nsmulRec
+    nsmul     := @nsmulRec (Tree α) (Zero.mk Tree.nil) (Add.mk Tree.graft)
   }
 
 /- 1.3 (**optional**). Explain why `Tree` with `graft` as addition cannot be
