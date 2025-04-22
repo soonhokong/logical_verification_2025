@@ -48,17 +48,15 @@ addition operator. -/
 #print AddMonoid
 
 instance Tree.AddMonoid {α : Type} : AddMonoid (Tree α) :=
-  { add       :=
-      sorry
+  { add       := Tree.graft
     add_assoc :=
       sorry
-    zero      :=
-      sorry
+    zero      := Tree.nil
     add_zero  :=
       sorry
     zero_add  :=
       sorry
-    nsmul     := @nsmulRec (Tree α) (Zero.mk Tree.nil) (Add.mk Tree.graft)
+    nsmul     := nsmulRec
   }
 
 /- 1.3 (**optional**). Explain why `Tree` with `graft` as addition cannot be
