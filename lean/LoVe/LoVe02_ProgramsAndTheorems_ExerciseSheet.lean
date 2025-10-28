@@ -22,18 +22,17 @@ its argument, or 0 if the argument is 0. For example:
     `pred 7 = 6`
     `pred 0 = 0` -/
 
-def pred : ℕ → ℕ :=
-  sorry
+def pred : ℕ → ℕ
+  | 0 => 0
+  | n + 1 => n
 
 /- 1.2. Check that your function works as expected. -/
-
-#eval pred 0    -- expected: 0
-#eval pred 1    -- expected: 0
-#eval pred 2    -- expected: 1
-#eval pred 3    -- expected: 2
-#eval pred 10   -- expected: 9
-#eval pred 99   -- expected: 98
-
+#guard pred 0 = 0
+#guard pred 1 = 0
+#guard pred 2 = 1
+#guard pred 3 = 2
+#guard pred 10 = 9
+#guard pred 99 = 98
 
 /- ## Question 2: Arithmetic Expressions
 
@@ -71,6 +70,10 @@ operators. -/
 def simplify : AExp → AExp
   | AExp.add (AExp.num 0) e₂ => simplify e₂
   | AExp.add e₁ (AExp.num 0) => simplify e₁
+  | AExp.sub e₁ (AExp.num 0) => simplify e₁
+  | AExp.mul _ (AExp.num 0) => AExp.num 0
+  | AExp.mul (AExp.num 0) _ => AExp.num 0
+  | AExp.div (AExp.num 0) _ => AExp.num 0
   -- insert the missing cases here
   -- catch-all cases below
   | AExp.num i               => AExp.num i
@@ -90,7 +93,7 @@ the property that the value of `e` after simplification is the same as the
 value of `e` before. -/
 
 theorem simplify_correct (env : String → ℤ) (e : AExp) :
-  True :=   -- replace `True` by your theorem statement
+  eval env e = eval env (simplify e) :=   -- replace `True` by your theorem statement
   sorry   -- leave `sorry` alone
 
 
@@ -99,10 +102,14 @@ theorem simplify_correct (env : String → ℤ) (e : AExp) :
 3.1 (**optional**). Define a generic `map` function that applies a function to
 every element in a list. -/
 
-def map {α : Type} {β : Type} (f : α → β) : List α → List β :=
-  sorry
+def map {α : Type} {β : Type} (f : α → β) : List α → List β
+  | [] => []
+  | x :: xs => f x :: map f xs
+
 
 #eval map (fun n ↦ n + 10) [1, 2, 3]   -- expected: [11, 12, 13]
+#guard (map (fun n ↦ n + 10) [1, 2, 3]) = [11,12,13]   -- expected: [11, 12, 13]
+
 
 /- 3.2 (**optional**). State (without proving them) the so-called functorial
 properties of `map` as theorems. Schematically:
@@ -114,5 +121,9 @@ Try to give meaningful names to your theorems. Also, make sure to state the
 second property as generally as possible, for arbitrary types. -/
 
 -- enter your theorem statements here
+
+theorem mapId {α : Type} (xs : List α) : map (fun x ↦ x) xs = xs := by sorry
+theorem map2 {α β γ: Type} (xs : List α) (f : α → β) (g : β → γ) : map (fun x ↦ g $ f $ x) xs = map g (map f xs) := by sorry
+
 
 end LoVe

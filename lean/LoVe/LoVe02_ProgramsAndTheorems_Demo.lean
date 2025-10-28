@@ -63,6 +63,56 @@ inductive AExp : Type where
   | div : AExp → AExp → AExp
 
 
+
+def evaluate (env : Std.HashMap String ℤ) (e : AExp) : Option ℤ := match e with
+| .num n => some n
+| .var s =>
+  if h : env.contains s then
+    some (env.get s h)
+  else
+    none
+| .add e1 e2 => do
+  let v1 ← evaluate env e1
+  let v2 ← evaluate env e2
+  return v1 + v2
+| .sub e1 e2 => do
+  let v1 ← evaluate env e1
+  let v2 ← evaluate env e2
+  return v1 - v2
+| .mul e1 e2 => do
+  let v1 ← evaluate env e1
+  let v2 ← evaluate env e2
+  return v1 * v2
+| .div e1 e2 => do
+  let v1 ← evaluate env e1
+  let v2 ← evaluate env e2
+  if v2 == 0 then
+    none
+  else
+    return v1 / v2
+
+-- Example usage
+def exampleEnv : Std.HashMap String ℤ :=
+  Std.HashMap.emptyWithCapacity
+    |>.insert "x" 10
+    |>.insert "y" 40
+    |>.insert "z" 5
+
+def exampleEnv2 : Std.HashMap String ℤ :=
+  Std.HashMap.emptyWithCapacity
+    |>.insert "x" 10
+    |>.insert "y" 40
+    |>.insert "z" 5
+
+-- Test expressions
+def expr1 : AExp := .add (.var "x") (.var "y")  -- x + y
+def expr2 : AExp := .mul (.var "x") (.num 7)    -- x * 3
+def expr3 : AExp := .add (.var "x") (.var "w")  -- x + w (w not in env)
+
+#eval evaluate exampleEnv expr1  -- some 30
+#eval evaluate exampleEnv expr2  -- some 30
+#eval evaluate exampleEnv expr3  -- none (because "w" is not in the environment)
+
 /- ### Lists -/
 
 namespace MyList
@@ -116,7 +166,12 @@ def power : ℕ → ℕ → ℕ
   | _, Nat.zero   => 1
   | m, Nat.succ n => mul m (power m n)
 
-#eval power 2 5
+def power2 (m : ℕ) : ℕ → ℕ
+  | 0 => 1 -- x ^ 0 = 1
+    -- m ^ (n+1) = m ^ n * m
+  | n + 1 => (power2 m n) * m
+
+#eval power2 2 5
 
 /- `add`, `mul`, and `power` are artificial examples. These operations are
 already available in Lean as `+`, `*`, and `^`.
@@ -130,6 +185,14 @@ def powerParam (m : ℕ) : ℕ → ℕ
 
 #eval powerParam 2 5
 
+def iter2 {α : Type} (z : α) (f : α → α) : ℕ → α
+  | 0 => z
+  | n + 1 => f (iter2 z f n)
+
+
+
+
+
 def iter (α : Type) (z : α) (f : α → α) : ℕ → α
   | Nat.zero   => z
   | Nat.succ n => f (iter α z f n)
@@ -138,6 +201,9 @@ def iter (α : Type) (z : α) (f : α → α) : ℕ → α
 
 def powerIter (m n : ℕ) : ℕ :=
   iter ℕ 1 (mul m) n
+
+def powerIter2 (m n : Nat) : Nat :=
+  iter2 1 (mul m) n
 
 #eval powerIter 2 5
 
@@ -208,8 +274,7 @@ the result is a proposition rather than data or a function. -/
 namespace SorryTheorems
 
 theorem add_comm (m n : ℕ) :
-    add m n = add n m :=
-  sorry
+    add m n = add n m := sorry
 
 theorem add_assoc (l m n : ℕ) :
     add (add l m) n = add l (add m n) :=

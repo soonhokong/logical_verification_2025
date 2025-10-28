@@ -33,8 +33,7 @@ The keyword `by` indicates to Lean the proof is tactical. -/
 theorem fst_of_two_props :
     ∀a b : Prop, a → b → a :=
   by
-    intro a b
-    intro ha hb
+    intro a b ha hb
     apply ha
 
 /- Note that `a → b → a` is parsed as `a → (b → a)`.
