@@ -121,9 +121,9 @@ Try to give meaningful names to your theorems. Also, make sure to state the
 second property as generally as possible, for arbitrary types. -/
 
 -- enter your theorem statements here
+theorem map1 {α: Type} (l : List α) : map id l = l := sorry
 
-theorem mapId {α : Type} (xs : List α) : map (fun x ↦ x) xs = xs := by sorry
-theorem map2 {α β γ: Type} (xs : List α) (f : α → β) (g : β → γ) : map (fun x ↦ g $ f $ x) xs = map g (map f xs) := by sorry
-
+theorem map2 {α β γ: Type} (f: α → β) (g: β → γ) (l : List α)
+  : map (fun x => g $ f x) l = map g (map f l) := sorry
 
 end LoVe
