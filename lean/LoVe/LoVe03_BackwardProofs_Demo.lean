@@ -112,7 +112,7 @@ def double (n : ℕ) : ℕ :=
 -- Delta-conversion: unfolding definitions.
 theorem δ_example :
     double 5 = 5 + 5 :=
-  by
+  by rfl
 
 /- `let` introduces a definition that is locally scoped. Below, `n := 2` is only
 in scope in the expression `n + n`. -/
@@ -323,33 +323,54 @@ theorem abc_Eq_cba (a b c : ℕ) :
 `induction` performs induction on the specified variable. It gives rise to one
 named subgoal per constructor. -/
 
+-- Soonho: 2025/11/17 working on this.
+
 theorem add_zero (n : ℕ) :
     add 0 n = n :=
   by
     induction n with
-    | zero       => rfl
-    | succ n' ih => simp [add, ih]
+    | zero => rfl
+    | succ n' ih =>
+      rewrite [add]
+      rewrite [ih]
+      rfl
 
+-- (m + 1) + n = (m + n) + 1
 theorem add_succ (m n : ℕ) :
     add (Nat.succ m) n = Nat.succ (add m n) :=
   by
     induction n with
-    | zero       => rfl
-    | succ n' ih => simp [add, ih]
+    | zero => rfl
+    | succ n' ih =>
+      rewrite [add]
+      rewrite [ih]
+      rewrite [add]
+      rfl
 
 theorem add_comm (m n : ℕ) :
     add m n = add n m :=
   by
     induction n with
-    | zero       => simp [add, add_zero]
-    | succ n' ih => simp [add, add_succ, ih]
+    | zero       =>
+      rewrite [add_zero]
+      rewrite [add]
+      rfl
+    | succ n' ih =>
+      -- m + (n' + 1) = (n' + 1) + m
+      rewrite [add]
+      -- (m + n') + 1 = (n' + 1) + m
+      rewrite [ih]
+      -- (n' + m) + 1 = (n' + 1) + m
+      rewrite [add_succ]
+      -- (n' + m) + 1 = (n' + m) + 1
+      rfl
 
 theorem add_assoc (l m n : ℕ) :
     add (add l m) n = add l (add m n) :=
   by
     induction n with
-    | zero       => rfl
-    | succ n' ih => simp [add, ih]
+    | zero       =>
+    | succ n' ih =>
 
 /- `ac_rfl` is extensible. We can register `add` as a commutative and
 associative operator using the type class instance mechanism (explained in
